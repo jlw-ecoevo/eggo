@@ -99,40 +99,40 @@ tip_meta_sub <- tip_meta %>%
 rownames(tip_meta_sub) <- tip_meta_sub$Tip
 x_sub <- drop.tip(x, which(!(x$tip.label %in% tip_meta_sub$Tip)))
 
-#Predict - very slow
-neighbor_pred_list <- mclapply(1:Ntip(x_sub), 
-                               getNeighborhoodPrediction, 
-                               tree=x_sub, 
-                               values=tip_meta_sub[x_sub$tip.label,"d"],
-                               mc.cores = 6)
-neighbor_pred <- do.call("rbind",neighbor_pred_list) %>%
-  as.data.frame(stringsAsFactors = F)
-setwd("~/eggo/Data")
-save(neighbor_pred, file = "neighbors.RData")
-
-nt <- numeric(length(x$tip.label))
-dnt <- numeric(length(x$tip.label))
-for(i in 1:length(x$tip.label)){
-  if(i%%100==0){print(i)}
-  nt[i] <- find_nearest_tips(x, target_tips = x$tip.label[-i])$nearest_tip_per_tip[i]
-  dnt[i] <- find_nearest_tips(x, target_tips = x$tip.label[-i])$nearest_distance_per_tip[i]
-}
-
-x_dist <- data.frame(Name = x$tip.label,
-                     Nearest = nt,
-                     NearestDist = dnt)
-x_dist$Name <- as.character(x_dist$Name)
-x_dist$NearestName <- x$tip.label[x_dist$Nearest]
-x_dist$d1 <- tip_meta[x_dist$Name,"d"]
-x_dist$d2 <- tip_meta[x_dist$NearestName,"d"]
-x_dist$Org1 <- tip_meta[x_dist$Name,"ID"]
-x_dist$Org2 <- tip_meta[x_dist$NearestName,"ID"]
-setwd("~/eggo/Data")
-save(x_dist,file="nearest_neighbors.Rdata")
+# #Predict - very slow
+# neighbor_pred_list <- mclapply(1:Ntip(x_sub), 
+#                                getNeighborhoodPrediction, 
+#                                tree=x_sub, 
+#                                values=tip_meta_sub[x_sub$tip.label,"d"],
+#                                mc.cores = 6)
+# neighbor_pred <- do.call("rbind",neighbor_pred_list) %>%
+#   as.data.frame(stringsAsFactors = F)
+# setwd("~/eggo/Data")
+# save(neighbor_pred, file = "neighbors.RData")
+# 
+# nt <- numeric(length(x$tip.label))
+# dnt <- numeric(length(x$tip.label))
+# for(i in 1:length(x$tip.label)){
+#   if(i%%100==0){print(i)}
+#   nt[i] <- find_nearest_tips(x, target_tips = x$tip.label[-i])$nearest_tip_per_tip[i]
+#   dnt[i] <- find_nearest_tips(x, target_tips = x$tip.label[-i])$nearest_distance_per_tip[i]
+# }
+# 
+# x_dist <- data.frame(Name = x$tip.label,
+#                      Nearest = nt,
+#                      NearestDist = dnt)
+# x_dist$Name <- as.character(x_dist$Name)
+# x_dist$NearestName <- x$tip.label[x_dist$Nearest]
+# x_dist$d1 <- tip_meta[x_dist$Name,"d"]
+# x_dist$d2 <- tip_meta[x_dist$NearestName,"d"]
+# x_dist$Org1 <- tip_meta[x_dist$Name,"ID"]
+# x_dist$Org2 <- tip_meta[x_dist$NearestName,"ID"]
+# setwd("~/eggo/Data")
+# save(x_dist,file="nearest_neighbors.RData")
 
 setwd("~/eggo/Data")
 load("neighbors.RData")
-load("nearest_neighbors.RData")
+
 
 #Sample 10000 tips
 n <- 10000
@@ -181,6 +181,8 @@ pdf("16S_PairDistances.pdf",width=7,height=5)
 p2
 dev.off()
 
+setwd("~/eggo/Data")
+load("nearest_neighbors.RData")
 
 xd <- x_dist %>% subset(Org1!=Org2) %>% subset(d1<100 & d2<100)
 xd$ld1 <- log10(xd$d1)
