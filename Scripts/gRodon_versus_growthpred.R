@@ -179,7 +179,7 @@ save(stat_data,file="stat_data.RData")
 
 p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) + 
   scale_x_log10() + scale_y_log10() + theme_bw() + 
-  geom_smooth(color="darkgrey") + xlab("Doubling Time (Hours)") + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
   ylab("Predicted Minimal Doubling Time (Hours)") + 
   geom_abline(slope = 1,intercept = 0,lty=2) + 
   geom_vline(xintercept = 5,lty=2,color="red")
@@ -187,14 +187,14 @@ p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) +
 
 p2 <- ggplot(stat_data,aes(x=d,y=CUBHE)) + geom_point(alpha=0.5) + 
   scale_x_log10()  + theme_bw() + 
-  geom_smooth(color="darkgrey") + xlab("Doubling Time (Hours)") + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
   ylab("Codon Usage Bias (Ribosomal Proteins)") + 
   geom_vline(xintercept = 5,lty=2,color="red")
 
 p3 <- ggplot() +theme_minimal()
 
 setwd("~/eggo/Figs")
-pdf("gRodon_performance.pdf",width=7,height=3)
+pdf("gRodon_performance.pdf",width=8.75,height=3.75)
 ggarrange(p3,
           ggarrange(p1,p2,nrow=1,
                     labels = c("(a)","(b)"),

@@ -163,7 +163,7 @@ p1 <- ggplot(neighbor_pred,aes(x=Actual,y=Predicted)) +
   geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
   scale_x_log10() + scale_y_log10() + theme_bw() + 
-  xlab("Doubling Time (d)") + 
+  xlab("Minimal Doubling Time (d)") + 
   ylab(expression("Predicted Minimal Doubling Time (" * d["predicted"] * ")")) + 
   theme(legend.position = "bottom")
 
@@ -200,7 +200,7 @@ p1 <- ggplot(xd,aes(x=d1,y=d2)) +
   geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
   scale_x_log10() + scale_y_log10() + theme_bw() + 
-  xlab("Doubling Time (d)") + 
+  xlab("Minimal Doubling Time (d)") + 
   ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) + 
   theme(legend.position = "bottom")
 
