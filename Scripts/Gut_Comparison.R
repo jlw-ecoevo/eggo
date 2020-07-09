@@ -37,7 +37,7 @@ p1 <- ggplot(NULL,aes(x=d)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme(legend.title = element_blank(),legend.position = "bottom") + 
   geom_vline(xintercept = 5, lty = 2, color = "red") + 
-  xlab("Predicted Doubling Time (Hours)") 
+  xlab("Predicted Minimal Doubling Time (Hours)") 
 
 x <- data.frame(Fast=rep(c(F,T),3),
            Data=c("Isolate (Poyet)","Isolate (Poyet)","Isolate (Zou)","Isolate (Zou)","MAG","MAG"),
@@ -67,7 +67,7 @@ t.test(log10(d)~NonWesternized,data=mag_df)
 p3 <- ggplot(mag_df,aes(y=d,x=NonWesternized,group=NonWesternized)) + 
   geom_violin(fill="gray") + geom_boxplot(width=0.5) + 
   scale_y_log10() + theme_bw() + 
-  ylab("Predicted Doubling Time (Hours)") +
+  ylab("Predicted Minimal Doubling Time (Hours)") +
   xlab("") + 
   theme(axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1))
 
@@ -92,7 +92,7 @@ p1 <- ggplot(bs_mag,aes(x=d,fill=Body.Site)) +
   geom_density(alpha=0.5) + scale_x_log10() + theme_bw() +
   scale_fill_manual(values = brewer.pal(5,"Set1")[1:2]) +
   labs(fill="") + theme(legend.position = "bottom") + 
-  xlab("Predicted Doubling Time (Hours)") + 
+  xlab("Predicted Minimal Doubling Time (Hours)") + 
   geom_vline(xintercept = 5, color="red", lty=2)
 
 bs_mag <- all_mag %>% subset(Body.Site %in% c("Oral cavity",
@@ -102,7 +102,7 @@ p2 <- ggplot(bs_mag,aes(x=d,fill=Body.Site)) +
   geom_density(alpha=0.5) + scale_x_log10() + theme_bw() +
   scale_fill_manual(values = brewer.pal(5,"Set1")[3:5]) +
   labs(fill="") + theme(legend.position = "bottom") + 
-  xlab("Predicted Doubling Time (Hours)") + 
+  xlab("Predicted Minimal Doubling Time (Hours)") + 
   geom_vline(xintercept = 5, color="red", lty=2)
 
 setwd("~/eggo/Figs")

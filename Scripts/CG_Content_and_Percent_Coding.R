@@ -86,10 +86,10 @@ vs_avg$Residual <- gRodon_model_base$residuals
 
 p1 <- ggplot(vs_avg,aes(x=GC,y=d)) + 
   geom_point() + stat_smooth() + scale_y_log10() + 
-  theme_bw() + ylab("Doubling Time (Hours)")
+  theme_bw() + ylab("Minimal Doubling Time (Hours)")
 p2 <- ggplot(vs_avg,aes(x=PercentCoding,y=d)) + 
   geom_point() + stat_smooth() + scale_y_log10() + 
-  theme_bw() + ylab("Doubling Time (Hours)") + 
+  theme_bw() + ylab("Minimal Doubling Time (Hours)") + 
   geom_hline(yintercept = 0,lty=2) + 
   xlab("Percent Coding")
 

@@ -26,5 +26,5 @@ pdf("Pasolli_vs_Nayfach.pdf",width=7,height=5)
 ggplot(mag_df1,aes(x=d,fill="Pasolli et al.")) + geom_density(alpha=0.5) + 
   geom_density(data=mag_df2,aes(fill="Nayfach et al."),alpha=0.5) + 
   scale_x_log10(limit=c(0.05,100)) + theme_bw() + labs(fill="MAGs Set") + 
-  xlab("Predicted Doubling Time (Hours)")
+  xlab("Predicted Minimal Doubling Time (Hours)")
 dev.off()

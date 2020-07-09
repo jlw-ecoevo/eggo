@@ -160,7 +160,7 @@ EGGO <- rbind(refseq,
 table(EGGO$Environment)
 table(EGGO$Type)
 table(EGGO$Source)
-
+sum(refseq$d>100)
 
 setwd("~/eggo/Data")
 save(EGGO,file="EGGO.RData")

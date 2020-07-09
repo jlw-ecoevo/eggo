@@ -47,14 +47,14 @@ table(sdf$CellDiameter < quantile((sdf$CellDiameter),c(0.99)),
 p1 <- ggplot(sdf,aes(y=CellDiameter,x=d)) + 
   geom_point(alpha=0.5) + scale_y_log10() + scale_x_log10() + geom_smooth() + 
   theme_bw() + xlab(expression("Cell Diameter (" * mu * "m)")) +
-  xlab("Predicted Doubling Time (Hours)") + 
+  xlab("Predicted Minimal Doubling Time (Hours)") + 
   geom_hline(yintercept=quantile((sdf$CellDiameter),c(0.99)),lty=2,col="red") +
   geom_vline(xintercept=quantile((sdf$d),c(0.01)),lty=2,col="red")
 
 p2 <- ggplot(sdf,aes(x=d,fill=(CellDiameter>quantile((sdf$CellDiameter),c(0.99))))) + 
   geom_density(alpha=0.5) + theme_bw() +
   scale_x_log10() + labs(fill="Top 1% Cell Size?") + 
-  xlab("Predicted Doubling Time (Hours)") +
+  xlab("Predicted Minimal Doubling Time (Hours)") +
   theme(legend.position = "top") +
   scale_fill_manual(values = brewer.pal(4,"Set1")[1:2])
 
@@ -85,6 +85,6 @@ pdf("GORG_cutoff.pdf", width = 7, height = 5)
 ggplot(sag_df_all,aes(x = nHE, y = d)) + geom_point() + 
   scale_y_log10() + geom_smooth() + theme_bw() + 
   geom_vline(xintercept = 10, color = "red", lty = 5) + 
-  ylab("Predicted Doubling Time (Hours)") + 
+  ylab("Predicted Minimal Doubling Time (Hours)") + 
   xlab("Number of Ribosomal Proteins")
 dev.off()

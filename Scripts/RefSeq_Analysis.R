@@ -31,7 +31,7 @@ pdf("RefSeq_Growth_All.pdf",width=7,height=5)
 ggplot(assembly_df,aes(x=d)) + geom_density() + 
   scale_x_log10(limit=c(0.05,100)) + theme_bw() +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
-  xlab("Predicted Doubling Time (Hours)")
+  xlab("Predicted Minimal Doubling Time (Hours)")
 dev.off()
 
 # Subsample by genus -----------------------------------------------------------
@@ -44,6 +44,7 @@ genus_df <- assembly_df %>% group_by(Genus) %>% sample_n(1)
 
 x <- log10(genus_df$d)
 m <- Mclust(x)
+10^m$parameters$mean
 
 
 # Plot Clusters ----------------------------------------------------------------
@@ -62,7 +63,7 @@ p1 <- ggplot() + geom_density(data=genus_df,aes(x=d),lwd=1.5) +
   geom_line(data=cl_df,aes(x=x,y=cl2,color="Cluster 2"),lwd=1) + 
   theme_bw() + scale_color_brewer(palette = "Set1")  +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
-  xlab("Predicted Doubling Time (Hours)")  + 
+  xlab("Predicted Minimal Doubling Time (Hours)")  + 
   labs(color="")
 
 setwd("~/eggo/Figs")
@@ -73,7 +74,7 @@ ggplot() +
   scale_x_log10(limit=c(0.05,100)) +
   theme_bw() + scale_color_brewer(palette = "Set1")  +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
-  xlab("Predicted Doubling Time (Hours)")  + 
+  xlab("Predicted Minimal Doubling Time (Hours)")  + 
   labs(fill="")
 dev.off()
 
@@ -95,7 +96,7 @@ p2 <- ggplot(pdf1_genus,aes(x=d,fill=Phylum)) +
                      legend.text = element_text(size=7),
                      legend.key.size = unit(0.6, "lines")) + 
   labs(fill="") + 
-  xlab("Predicted Doubling Time (Hours)") + 
+  xlab("Predicted Minimal Doubling Time (Hours)") + 
   scale_fill_manual(values = brewer.pal(7,"Set1")[1:4])
 
 p3 <- ggplot(pdf2_genus,aes(x=d,fill=Phylum)) + 
@@ -105,7 +106,7 @@ p3 <- ggplot(pdf2_genus,aes(x=d,fill=Phylum)) +
                      legend.text = element_text(size=7),
                      legend.key.size = unit(0.6, "lines")) + 
   labs(fill="") + 
-  xlab("Predicted Doubling Time (Hours)") + 
+  xlab("Predicted Minimal Doubling Time (Hours)") + 
   scale_fill_manual(values = brewer.pal(7,"Set1")[5:7])
 
 

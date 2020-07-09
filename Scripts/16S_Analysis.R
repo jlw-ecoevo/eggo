@@ -154,12 +154,17 @@ x_dist$dErr <- (log10(x_dist$d1)-log10(x_dist$d2))^2
 x_dist$dErr2 <- abs((x_dist$d1)-(x_dist$d2))
 
 
+cor.test(log10(neighbor_pred$Actual),log10(neighbor_pred$Predicted))
+confusion_matrix <- table(neighbor_pred$Actual>5,neighbor_pred$Predicted>5)
+cohen.kappa(confusion_matrix)
+sum(diag(confusion_matrix))/sum(confusion_matrix)
+  
 p1 <- ggplot(neighbor_pred,aes(x=Actual,y=Predicted)) + 
   geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
   scale_x_log10() + scale_y_log10() + theme_bw() + 
   xlab("Doubling Time (d)") + 
-  ylab(expression("Predicted Doubling Time (" * d["predicted"] * ")")) + 
+  ylab(expression("Predicted Minimal Doubling Time (" * d["predicted"] * ")")) + 
   theme(legend.position = "bottom")
 
 p2 <- ggplot(x_dist,aes(x = value + 1e-8, y = dErr2)) + 
@@ -189,12 +194,14 @@ xd$ld1 <- log10(xd$d1)
 xd$ld2 <- log10(xd$d2)
 xd$dErr <- (xd$ld1-xd$ld2)^2
 
+cor.test(xd$ld1,xd$ld2)
+
 p1 <- ggplot(xd,aes(x=d1,y=d2)) + 
   geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
   scale_x_log10() + scale_y_log10() + theme_bw() + 
   xlab("Doubling Time (d)") + 
-  ylab(expression("Predicted Doubling Time (" * d["Closest Relative"] * ")")) + 
+  ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) + 
   theme(legend.position = "bottom")
 
 setwd("~/eggo/Figs")

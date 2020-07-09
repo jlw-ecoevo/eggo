@@ -45,7 +45,7 @@ p1 <- ggplot(NULL,aes(x=d)) +
         legend.text = element_text(size=8),
         legend.key.size = unit(0.8, "lines")) + 
   geom_vline(xintercept = 5, lty = 2, color = "red") + 
-  xlab("Predicted Doubling Time (Hours)") 
+  xlab("Predicted Minimal Doubling Time (Hours)") 
 
 p1l <- ggplot(NULL,aes(x=d)) + 
   geom_density(data=isolate_df,aes(fill="MarRef Genomes"),
@@ -60,7 +60,7 @@ p1l <- ggplot(NULL,aes(x=d)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme(legend.title = element_blank(),legend.position = "bottom") + 
   geom_vline(xintercept = 5, lty = 2, color = "red") + 
-  xlab("Predicted Doubling Time (Hours)") 
+  xlab("Predicted Minimal Doubling Time (Hours)") 
 
 x <- data.frame(Fast=rep(c(F,T),4),
            Data=c("Isolate","Isolate",

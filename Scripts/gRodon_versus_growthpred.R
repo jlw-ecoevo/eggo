@@ -105,6 +105,10 @@ ggqqplot(mnew_milc$residuals)
 ggqqplot(m_gp$residuals)
 ggqqplot(mnew_gp$residuals)
 
+smm <- summary(mnew_milc)
+smm$coefficients
+smm$r.squared
+
 # ANOVA COmparison of Models ---------------------------------------------------
 
 anova(lm(boxcoxTransform(d, lambda_milc) ~ boxcoxTransform(dGP, lambda_gp),data=stat_data),
@@ -176,7 +180,7 @@ save(stat_data,file="stat_data.RData")
 p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) + 
   scale_x_log10() + scale_y_log10() + theme_bw() + 
   geom_smooth(color="darkgrey") + xlab("Doubling Time (Hours)") + 
-  ylab("Predicted Doubling Time (Hours)") + 
+  ylab("Predicted Minimal Doubling Time (Hours)") + 
   geom_abline(slope = 1,intercept = 0,lty=2) + 
   geom_vline(xintercept = 5,lty=2,color="red")
 
@@ -208,8 +212,8 @@ pS1 <- ggplot(stat_data,aes(x=d,y=dGR)) +
   #geom_smooth(aes(y = dGPM, col = "growthpred M"), se = F) +
   scale_x_log10() + scale_y_log10() + theme_bw() + 
   geom_abline(slope = 1,intercept = 0,lty=2) + 
-  xlab("Doubling Time (Hours)") + 
-  ylab("Predicted Doubling Time (Hours)") + 
+  xlab("Actual Minimal Doubling Time (Hours)") + 
+  ylab("Predicted Minimal Doubling Time (Hours)") + 
   labs(color = "Prediction Method") 
 
 
@@ -353,7 +357,7 @@ p1 <- ggplot(stat_data,aes(x=dGR)) +
   geom_density(aes(x=dGR,fill="Predictions (gRodon)"),alpha=0.5,lwd=1) + 
   geom_density(aes(x=d,fill="Actual Values"),alpha=0.5,lwd=1) +
   theme_bw() + geom_vline(xintercept=5,lty=2,color="red") + 
-  xlab("Doubling Time (Hours)") + 
+  xlab("Minimal Doubling Time (Hours)") + 
   theme(legend.title = element_blank()) + 
   scale_fill_brewer(palette = "Accent")
 

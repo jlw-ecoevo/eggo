@@ -35,7 +35,7 @@ summary(lm(Residual ~ Ne, data=stat_data))
 
 p1 <- ggplot(stat_data,aes(x=Ne,y=d)) + geom_point() + 
   geom_smooth(color="darkgray") + 
-  ylab("Doubling Time (Hours)") + scale_y_log10() +
+  ylab("Minimal Doubling Time (Hours)") + scale_y_log10() +
   theme_bw()
 p2 <- ggplot(stat_data,aes(x=Ne,y=Residual)) + geom_point() + 
   geom_smooth(color="darkgray") + 
