@@ -37,8 +37,8 @@ dev.off()
 # Subsample by genus -----------------------------------------------------------
 
 
-genus_df <- assembly_df %>% group_by(Genus) %>% sample_n(1)
-
+# genus_df <- assembly_df %>% group_by(Genus) %>% sample_n(1)
+genus_df <- assembly_df %>% group_by(Genus,Phylum) %>% summarise_all(mean)
 
 # Cluster growth rates ---------------------------------------------------------
 
@@ -50,21 +50,25 @@ m <- Mclust(x)
 # Plot Clusters ----------------------------------------------------------------
 
 p <- (colSums(m$z)/sum(m$z))
+
 cl_df <- data.frame(x=10^seq(-2,3,0.01),
                     cl1=dnorm(seq(-2,3,0.01),
                               mean=m$parameters$mean[1],
-                              sd=sqrt(m$p$variance$sigmasq))*p[1],
+                              sd=sqrt(m$p$variance$sigmasq[1]))*p[1],
                     cl2=dnorm(seq(-2,3,0.01),
                               mean=m$parameters$mean[2],
-                              sd=sqrt(m$p$variance$sigmasq))*p[2])
-p1 <- ggplot() + geom_density(data=genus_df,aes(x=d),lwd=1.5) + 
+                              sd=sqrt(m$p$variance$sigmasq[2]))*p[2])
+p1 <- ggplot() + geom_density(data=genus_df,aes(x=d),lwd=2) + 
   scale_x_log10(limit=c(0.05,100)) +
-  geom_line(data=cl_df,aes(x=x,y=cl1,color="Cluster 1"),lwd=1) + 
-  geom_line(data=cl_df,aes(x=x,y=cl2,color="Cluster 2"),lwd=1) + 
-  theme_bw() + scale_color_brewer(palette = "Set1")  +
+  # geom_line(data=cl_df,aes(x=x,y=cl1,color="Cluster 1"),lwd=1) + 
+  geom_polygon(data=cl_df,aes(x=x, y=cl1, fill="Cluster 1"),alpha=0.75, color="black") +
+  # geom_line(data=cl_df,aes(x=x,y=cl2,color="Cluster 2"),lwd=1) + 
+  geom_polygon(data=cl_df,aes(x=x, y=cl2, fill="Cluster 2"), alpha=0.75, color="black") +
+  theme_pubclean() + scale_color_brewer(palette = "Set1")  +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
   xlab("Predicted Minimal Doubling Time (Hours)")  + 
-  labs(color="")
+  theme(legend.position = "right") + 
+  labs(fill="")
 
 setwd("~/eggo/Figs")
 pdf("RefSeq_vs_Parks.pdf",width=10,height=5)
@@ -82,29 +86,29 @@ dev.off()
 # Plot by phylum ---------------------------------------------------------------
 
 table(genus_df$Phylum) %>% sort()
-pdf1_genus <- genus_df %>% subset(Phylum %in% c("Bacteroidetes",
+pdf1_genus <- genus_df %>% subset(Phylum %in% c("Proteobacteria",
+                                                "Bacteroidetes",
                                                "Actinobacteria",
-                                               "Firmicutes",
-                                               "Proteobacteria"))
+                                               "Firmicutes" ))
 pdf2_genus <- genus_df %>% subset(Phylum %in% c("Chloroflexi",
                                                "Planctomycetes",
                                                "Cyanobacteria"))
 p2 <- ggplot(pdf1_genus,aes(x=d,fill=Phylum)) + 
-  geom_density(alpha=0.5) + scale_x_log10(limit=c(0.05,100))  +
+  geom_density(alpha=0.6) + scale_x_log10(limit=c(0.05,100))  +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
-  theme_bw() + theme(legend.position = "bottom",
+  theme_pubclean() + theme(legend.position = "bottom",
                      legend.text = element_text(size=7),
-                     legend.key.size = unit(0.6, "lines")) + 
+                     legend.key.size = unit(0.7, "lines")) + 
   labs(fill="") + 
   xlab("Predicted Minimal Doubling Time (Hours)") + 
   scale_fill_manual(values = brewer.pal(7,"Set1")[1:4])
 
 p3 <- ggplot(pdf2_genus,aes(x=d,fill=Phylum)) + 
-  geom_density(alpha=0.5) + scale_x_log10(limit=c(0.05,100))  +
+  geom_density(alpha=0.6) + scale_x_log10(limit=c(0.05,100))  +
   geom_vline(xintercept = 5, color = "red", lty = 2) + 
-  theme_bw() + theme(legend.position = "bottom",
+  theme_pubclean() + theme(legend.position = "bottom",
                      legend.text = element_text(size=7),
-                     legend.key.size = unit(0.6, "lines")) + 
+                     legend.key.size = unit(0.8, "lines")) + 
   labs(fill="") + 
   xlab("Predicted Minimal Doubling Time (Hours)") + 
   scale_fill_manual(values = brewer.pal(7,"Set1")[5:7])

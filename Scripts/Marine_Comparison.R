@@ -31,19 +31,19 @@ mag_df_delmont <- mag_df_delmont %>% subset(nHE>=10)
 
 p1 <- ggplot(NULL,aes(x=d)) + 
   geom_density(data=isolate_df,aes(fill="MarRef Genomes"),
-               alpha=0.5,color="white") + 
+               alpha=0.75,color="black") + 
   geom_density(data=mag_df,aes(fill="Tully et al. MAGs"),
-               alpha=0.5,color="white") + 
+               alpha=0.75,color="black") + 
   geom_density(data=mag_df_delmont,aes(fill="Delmont et al. MAGs"),
-               alpha=0.5,color="white") + 
+               alpha=0.75,color="black") + 
   geom_density(data=sag_df,aes(fill="GORG-tropics SAGs"),
-               alpha=0.5,color="white") + 
-  scale_x_log10(limit=c(1,50)) + theme_bw() +
+               alpha=0.75,color="black") + 
+  scale_x_log10(limit=c(1,50)) + theme_pubclean() +
   scale_fill_brewer(palette = "Dark2") + 
   theme(legend.title = element_blank(),
         legend.position = "bottom",
         legend.text = element_text(size=8),
-        legend.key.size = unit(0.8, "lines")) + 
+        legend.key.size = unit(1.3, "lines")) + 
   geom_vline(xintercept = 5, lty = 2, color = "red") + 
   xlab("Predicted Minimal Doubling Time (Hours)") 
 
@@ -72,18 +72,18 @@ x <- data.frame(Fast=rep(c(F,T),4),
                    table(mag_df_delmont$d<5)/nrow(mag_df_delmont),
                    table(sag_df$d<5)/nrow(sag_df)))
 p2 <- ggplot(x%>%subset(Fast==T),aes(x=Data,y=Value,fill=Data)) + 
-  geom_bar(position="stack", stat="identity",alpha=0.75) +
-  theme_bw() + xlab("") + 
+  geom_bar(position="stack", stat="identity",alpha=0.75, color = "black") +
+  theme_pubclean() + xlab("") + 
   ylab(expression("Proportion Doubling Times  <5 Hours")) +
   # theme(axis.text.x = element_text(angle = 90,hjust=1),legend.position = "none") +
   # scale_fill_brewer(palette = "Dark2",direction = -1)+
   theme(legend.position = "none") +
   scale_fill_manual(values = brewer.pal(4,"Dark2")[c(3,1,4,2)]) + 
-  ggpubr::rotate_x_text()
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 setwd("~/eggo/Figs")
-pdf("MarineComparison.pdf",width=7,height=5)
-ggarrange(p1,p2,ncol=2,widths=c(5,1),
+pdf("MarineComparison.pdf",width=8,height=5)
+ggarrange(p1,p2,ncol=2,widths=c(4,1),
           labels=c("(a)","(b)"),
           hjust=0,
           vjust=1)

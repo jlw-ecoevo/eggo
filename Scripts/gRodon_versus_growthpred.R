@@ -178,7 +178,9 @@ save(stat_data,file="stat_data.RData")
 
 
 p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) + 
-  scale_x_log10() + scale_y_log10() + theme_bw() + 
+  scale_x_log10() + 
+  scale_y_log10() + 
+  theme_pubclean() + 
   geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
   ylab("Predicted Minimal Doubling Time (Hours)") + 
   geom_abline(slope = 1,intercept = 0,lty=2) + 
@@ -186,7 +188,7 @@ p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) +
 
 
 p2 <- ggplot(stat_data,aes(x=d,y=CUBHE)) + geom_point(alpha=0.5) + 
-  scale_x_log10()  + theme_bw() + 
+  scale_x_log10()  + theme_pubclean() + 
   geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
   ylab("Codon Usage Bias (Ribosomal Proteins)") + 
   geom_vline(xintercept = 5,lty=2,color="red")
@@ -198,8 +200,8 @@ pdf("gRodon_performance.pdf",width=8.75,height=3.75)
 ggarrange(p3,
           ggarrange(p1,p2,nrow=1,
                     labels = c("(a)","(b)"),
-                    hjust=-1,
-                    vjust=-0.5),
+                    hjust=0,
+                    vjust=-1.5),
           nrow=2,heights = c(1,9))
 dev.off()
 
@@ -277,7 +279,7 @@ err_df <- data.frame(gRodon=cv_rep["gRodon",]%>%unlist(),
 x <- melt(err_df)
 
 p1 <- ggplot(x,aes(x=variable,group=variable,y=value)) + 
-  geom_boxplot() + theme_bw() + 
+  geom_boxplot() + theme_pubclean() + 
   ylab("MSE from Cross Validation") + xlab("") + 
   scale_x_discrete(labels = c('gRodon',
                               'gRodon partial mode',
@@ -326,7 +328,7 @@ err_df_blocked <- data.frame(GP=unlist(err_gp),
 
 p2 <- ggplot(err_df_blocked,aes(y=GP,x=gRodon,size=n)) + 
   geom_point() + geom_abline(slope=1,intercept=0,lty=2) + 
-  theme_bw() + ylab("MSE growthpred") + 
+  theme_classic2() + ylab("MSE growthpred") + 
   xlim(0,2) + ylim(0,2) + box() + 
   xlab("Blocked CV MSE gRodon (By Phylum)") + 
   theme(legend.position = c(0.85,0.5),
@@ -341,7 +343,7 @@ dev.off()
 
 
 setwd("~/eggo/Figs")
-pdf("gRodon_vs_growthpred_cv.pdf",width=7,height=3.5)
+pdf("gRodon_vs_growthpred_cv.pdf",width=8,height=4)
 ggarrange(p1,
                     p2,
                     nrow=1,

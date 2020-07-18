@@ -9,6 +9,7 @@ library(MASS)
 library(reshape2)
 library(parallel)
 library(psych)
+library(ggpointdensity)
 
 set.seed(123456)
 
@@ -98,11 +99,11 @@ tip_meta_sub <- tip_meta %>%
   as.data.frame(stringsAsFactors=FALSE)
 rownames(tip_meta_sub) <- tip_meta_sub$Tip
 x_sub <- drop.tip(x, which(!(x$tip.label %in% tip_meta_sub$Tip)))
-
+# 
 # #Predict - very slow
-# neighbor_pred_list <- mclapply(1:Ntip(x_sub), 
-#                                getNeighborhoodPrediction, 
-#                                tree=x_sub, 
+# neighbor_pred_list <- mclapply(1:Ntip(x_sub),
+#                                getNeighborhoodPrediction,
+#                                tree=x_sub,
 #                                values=tip_meta_sub[x_sub$tip.label,"d"],
 #                                mc.cores = 6)
 # neighbor_pred <- do.call("rbind",neighbor_pred_list) %>%
@@ -158,23 +159,32 @@ cor.test(log10(neighbor_pred$Actual),log10(neighbor_pred$Predicted))
 confusion_matrix <- table(neighbor_pred$Actual>5,neighbor_pred$Predicted>5)
 cohen.kappa(confusion_matrix)
 sum(diag(confusion_matrix))/sum(confusion_matrix)
-  
+
+
 p1 <- ggplot(neighbor_pred,aes(x=Actual,y=Predicted)) + 
-  geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
+  geom_pointdensity(adjust=0.1)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
-  scale_x_log10() + scale_y_log10() + theme_bw() + 
+  scale_x_log10() + scale_y_log10() + theme_classic2() + 
   xlab("Minimal Doubling Time (d)") + 
+  scale_colour_gradient(low="white",high="black",trans = "log")+
   ylab(expression("Predicted Minimal Doubling Time (" * d["predicted"] * ")")) + 
-  theme(legend.position = "bottom")
+  theme(legend.position = c(0.9,0.5)) + 
+  labs(color = "Neighbor Density")
 
 p2 <- ggplot(x_dist,aes(x = value + 1e-8, y = dErr2)) + 
-  geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count)))) + 
-  scale_y_log10(limit=c(1e-1,1e2)) +scale_x_log10() + geom_smooth(color="black") + theme_bw() + 
-  geom_hline(yintercept = 0.5, lty = 2, color = "red") + 
+  geom_pointdensity(adjust=0.1)+ 
+  scale_colour_gradient(low="white",high="black",trans = "log")+
+  scale_y_log10(limit=c(1e-1,1e2)) +
+  scale_x_log10() + 
+  geom_smooth(color="gray") + 
+  theme_classic2() + 
+  geom_hline(yintercept = 0.5, lty = 2, color = "blue") + 
   geom_vline(xintercept = 0.2, lty = 2, color = "red") + 
   ylab(expression("Absolute Error (|" * d[1] - d[2] * "|)")) + 
-  xlab("Patristic Distance") + 
-  theme(legend.position = "bottom")
+  xlab("Patristic Distance")  + 
+  theme(legend.position = c(0.1,0.8)) + 
+  labs(color = "Neighbor Density")
+
 
 setwd("~/eggo/Figs")
 pdf("16S_Neighbors_and_Pairs.pdf",width=14,height=5)
@@ -196,13 +206,16 @@ xd$dErr <- (xd$ld1-xd$ld2)^2
 
 cor.test(xd$ld1,xd$ld2)
 
+
 p1 <- ggplot(xd,aes(x=d1,y=d2)) + 
-  geom_hex(aes(fill = stat(log10(count)),alpha=stat(log10(count))), bins=100)+ 
+  geom_pointdensity(adjust=0.1)+ 
   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
-  scale_x_log10() + scale_y_log10() + theme_bw() + 
+  scale_x_log10() + scale_y_log10() + theme_classic2() + 
+  scale_colour_gradient(low="white",high="black",trans = "log")+
   xlab("Minimal Doubling Time (d)") + 
   ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) + 
-  theme(legend.position = "bottom")
+  theme(legend.position = c(0.9,0.5)) + 
+  labs(color = "Neighbor Density")
 
 setwd("~/eggo/Figs")
 pdf("16S_Closest.pdf",width=7,height=5)

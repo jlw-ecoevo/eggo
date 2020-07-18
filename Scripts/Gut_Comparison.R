@@ -28,12 +28,12 @@ mag_df <- mag_df %>% subset(!is.na(d)) %>% subset(Body.Site=="Stool")
 
 p1 <- ggplot(NULL,aes(x=d)) + 
   geom_density(data=isolate_df1,aes(fill="Poyet et al Isolates"),
-               alpha=0.5,color="white") + 
+               alpha=0.75,color="black") + 
   geom_density(data=isolate_df2,aes(fill="Zou et al Isolates"),
-               alpha=0.5,color="white") + 
+               alpha=0.75,color="black") + 
   geom_density(data=mag_df,aes(fill="Pasolli et al MAGs"),
-               alpha=0.5,color="white") + 
-  scale_x_log10(limit=c(0.09,15)) + theme_bw() +
+               alpha=0.75,color="black") + 
+  scale_x_log10(limit=c(0.09,15)) + theme_pubclean() + #+ theme_bw() +
   scale_fill_brewer(palette = "Dark2") + 
   theme(legend.title = element_blank(),legend.position = "bottom") + 
   geom_vline(xintercept = 5, lty = 2, color = "red") + 
@@ -45,14 +45,14 @@ x <- data.frame(Fast=rep(c(F,T),3),
                    table(isolate_df2$d>5)/nrow(isolate_df2),
                    table(mag_df$d>5)/nrow(mag_df)))
 p2 <- ggplot(x%>%subset(Fast==T),aes(x=Data,y=Value,fill=Data)) + 
-  geom_bar(position="stack", stat="identity",alpha=0.75) +
-  theme_bw() + xlab("") + 
+  geom_bar(position="stack", stat="identity",alpha=0.75, color = "black") +
+  xlab("") + theme_pubclean() + # + theme_bw() + 
   ylab(expression("Proportion Doubling Times  >5 Hours")) +
   # theme(axis.text.x = element_text(angle = 90,hjust=1),legend.position = "none") +
   # scale_fill_brewer(palette = "Dark2",direction = -1)+
   theme(legend.position = "none") +
-  scale_fill_manual(values = brewer.pal(3,"Dark2")[c(2,3,1)]) + 
-  ggpubr::rotate_x_text()
+  scale_fill_manual(values = brewer.pal(3,"Dark2")[c(2,3,1)])+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 # Comparison of microbes assoc. w/ non-westernized microbiomes -----------------
 
@@ -65,20 +65,25 @@ table(mag_df$NonWesternized)
 t.test(log10(d)~NonWesternized,data=mag_df)
 
 p3 <- ggplot(mag_df,aes(y=d,x=NonWesternized,group=NonWesternized)) + 
-  geom_violin(fill="gray") + geom_boxplot(width=0.5) + 
-  scale_y_log10() + theme_bw() + 
+  geom_violin(fill="gray",alpha=0.75) + geom_boxplot(width=0.3) + 
+  scale_y_log10() + theme_pubclean() +#theme_bw() + 
   ylab("Predicted Minimal Doubling Time (Hours)") +
   xlab("") + 
-  theme(axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 # Put it together --------------------------------------------------------------
 
+
 setwd("~/eggo/Figs")
-pdf("GutComparison.pdf",width=7,height=4)
-ggarrange(p1,p2,p3,ncol=3,widths=c(4,1,1),
+pdf("GutComparison.pdf",width=8,height=5)
+ggarrange(p1,
+          p2,
+          p3,
+          ncol=3,widths=c(4,1,1),
           labels=c("(a)","(b)","(c)"),
           hjust=0,
-          vjust=1)
+          vjust=1,
+          align="hv")
 dev.off()
 
 # Plot by body site ------------------------------------------------------------
