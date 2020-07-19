@@ -1,20 +1,9 @@
 
-## JLW 2020 - Comparison Against Growrthpred Results on Original Viera-Silva et 
-## al. Dataset
-
-# Load Packages ----------------------------------------------------------------
-
 library(dplyr)
 library(data.table)
-library(MASS)
 library(ggplot2)
 library(ggpubr)
-library(car)
-library(lmtest)
-library(reshape2)
-library(psych)
-
-# Helper Functions -------------------------------------------------------------
+library(ggpointdensity)
 
 merge.easy <- function(df1,df2,key){
   df1 <- data.table(df1,key=key)
@@ -26,141 +15,141 @@ rgrep <- function(big,small_vec){
   small_vec[lapply(small_vec,grepl,x=big) %>% unlist()]
 }
 
-boxcoxTransform <- function(x, lambda, back_transform = F) {
-  if (back_transform == TRUE) {
-    (x*lambda +1)^(1/lambda)  %>% return()
-  } else {
-    (((x^lambda) - 1) / lambda) %>% return()
-  }
-}
-
-# Compile Dataset --------------------------------------------------------------
 
 setwd("~/eggo/Data")
-
-# gRodon fitting data
 load("gRodon-files/GrowthRates_Madin.rda")
-load("gRodon-files/CodonStatistics_Madin.rda")
+dm_all <- d
+load("gRodon-files/GrowthRates.rda")
+d_all <- unique(d)
+load("eggo-data/CodonStatistics_Training.RData")
 load("gRodon-files/Accession2Species_Madin.rda")
-cu <- cu %>% mutate_all(unlist)
-names(d)[1] <- "Species"
-d <- d %>% as.data.frame(stringsAsFactors=F)
+spp_acc_m <- spp_acc
+load("gRodon-files/Accession2Species.rda")
+load("EGGO.RData")
 
-# Merge datasets
+
+d <- d_all %>% subset(Extremophile=="")
+dm <- dm_all %>% subset(Extremophile==FALSE)
+
 rownames(spp_acc) <- spp_acc$V1 %>% gsub(pattern="[.].*",replace="")
-cu$Accession <- cu$File %>% gsub(pattern="[.].*",replace="")
-cu$Spp <- spp_acc[cu$Accession,"V2"]
-cu$Species <- lapply(cu$Spp,rgrep,small_vec=d$Species) %>%
+vs_df$Accession <- vs_df$Assembly %>% gsub(pattern="[.].*",replace="")
+vs_df$Spp <- spp_acc[vs_df$Accession,"V2"]
+vs_df$Species <- lapply(vs_df$Spp,rgrep,small_vec=d$Species) %>%
   lapply("[",1) %>% unlist()
-cu$Species[cu$Spp %in% d$Species] <- cu$Spp[cu$Spp %in% d$Species]
-cu <- merge.easy(cu,d,key="Species") %>% subset(!is.na(Species))
-
-# Average CUB estimates over species
-stat_data <- cu %>%
-  subset(Extremophile == FALSE) %>%
+vs_df$Species[vs_df$Spp %in% d$Species] <- vs_df$Spp[vs_df$Spp %in% d$Species]
+names(vs_df)[names(vs_df)=="d"] <- "d.vs"
+vs_df <- merge.easy(vs_df,d,key="Species") %>% subset(!is.na(Species))
+stat_data <- vs_df %>%
   group_by(Species) %>%
   summarise_all(mean,na.rm=T) %>%
   subset(!is.na(Species))
+plot(stat_data$d,stat_data$d.madin,log="xy")
 
+rownames(spp_acc_m) <- spp_acc_m$V1 %>% gsub(pattern="[.].*",replace="")
+madin_df$Accession <- madin_df$Assembly %>% gsub(pattern="[.].*",replace="")
+madin_df$Spp <- spp_acc_m[madin_df$Accession,"V2"]
+dm$Species <- dm$species
+madin_df$Species <- lapply(madin_df$Spp,rgrep,small_vec=dm$Species) %>%
+  lapply("[",1) %>% unlist()
+madin_df$Species[madin_df$Spp %in% dm$Species] <- madin_df$Spp[madin_df$Spp %in% dm$Species]
+names(madin_df)[names(madin_df)=="d"] <- "d.vs"
+madin_df <- merge.easy(madin_df,dm,key="Species") %>% subset(!is.na(Species))
+stat_data_madin <- madin_df %>%
+  group_by(Species) %>%
+  summarise_all(mean,na.rm=T) %>%
+  subset(!is.na(Species))
+plot(stat_data_madin$d,stat_data_madin$d.vs,log="xy")
 
-# Box Cox Transformation -------------------------------------------------------
-
-#linear models
-m_milc <- lm(d~CUBHE+ConsistencyHE+CPB,data=stat_data)
-#transformation
-bc_milc <- boxcox(d~CUBHE+ConsistencyHE+CPB,data=stat_data)
-lambda_milc <- bc_milc$x[which.max(bc_milc$y)]
-
-# re-run with transformation
-mnew_milc <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE+ConsistencyHE+CPB,data=stat_data)
-
-#look at residuals
-ggqqplot(m_milc$residuals)
-ggqqplot(mnew_milc$residuals)
-
-smm <- summary(mnew_milc)
-smm$coefficients
-smm$r.squared
-
-# Likelihood Ratio Test --------------------------------------------------------
-
-# Nested Models
-milc1 <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE,data=stat_data)
-milc2 <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE+ConsistencyHE,data=stat_data)
-milc3 <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE+ConsistencyHE+CPB,data=stat_data)
-
-# LR Test
-m.test1 <- lrtest(milc1, milc2)
-m.test2 <- lrtest(milc1, milc3)
-m.test3 <- lrtest(milc2, milc3)
-
-m.test1
-m.test2
-m.test3
-
-# Model Comparison/Performance -------------------------------------------------
-
-summary(mnew_milc)
-cor(boxcoxTransform(stat_data$d, lambda_milc),mnew_milc$fitted.values)
-
-plot(mnew_milc$fitted.values,boxcoxTransform(stat_data$d, lambda_milc))
-
-#Full gRodon
-gRodon_model_base <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE+ConsistencyHE+CPB,data=stat_data)
-
-# Partial genome mode
-gRodon_model_partial <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE+ConsistencyHE,data=stat_data)
-
-# Metagenome mode
-gRodon_model_meta <- 
-  lm(boxcoxTransform(d, lambda_milc) ~ CUBHE,data=stat_data)
-
-# Save compiled dataset
-stat_data$dGR <- boxcoxTransform(gRodon_model_base$fitted.values,
-                              lambda_milc,
-                              back_transform = TRUE)
-stat_data$dGRP <- boxcoxTransform(gRodon_model_partial$fitted.values,
-                              lambda_milc,
-                              back_transform = TRUE)
-stat_data$dGRM <- boxcoxTransform(gRodon_model_meta$fitted.values,
-                               lambda_milc,
-                               back_transform = TRUE)
-stat_data$Residual <- gRodon_model_base$residuals
-stat_data$ResidualM <- gRodon_model_meta$residuals
-save(stat_data,file="stat_data_madin.RData")
-
-# Plot Performance Nicely ------------------------------------------------------
-
-
-p1 <- ggplot(stat_data,aes(x=d,y=dGR)) + geom_point(alpha=0.5) + 
-  scale_x_log10() + scale_y_log10() + theme_bw() + 
-  geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
-  ylab("Predicted Minimal Doubling Time (Hours)") + 
+pMM <- ggplot(stat_data_madin,aes(x=d,y=d.madin)) + geom_point(alpha=0.5) + 
+  scale_x_log10() + scale_y_log10() + theme_pubclean() + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Min. Doubling Time (Madin et al.)") + 
+  ylab("Predicted Min. Doubling Time (Trained on Madin et al.)") + 
   geom_abline(slope = 1,intercept = 0,lty=2) + 
   geom_vline(xintercept = 5,lty=2,color="red")
 
-
-p2 <- ggplot(stat_data,aes(x=d,y=CUBHE)) + geom_point(alpha=0.5) + 
-  scale_x_log10()  + theme_bw() + 
-  geom_smooth(color="darkgrey") + xlab("Empirical Minimal Doubling Time (Hours)") + 
-  ylab("Codon Usage Bias (Ribosomal Proteins)") + 
+pVSVS <- ggplot(stat_data,aes(x=d,y=d.vs)) + geom_point(alpha=0.5) + 
+  scale_x_log10() + scale_y_log10() + theme_pubclean() + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Min. Doubling Time (Vieira-Silva et al.)") + 
+  ylab("Predicted Min. Doubling Time (Trained on Vieira-Silva et al.)") + 
+  geom_abline(slope = 1,intercept = 0,lty=2) + 
   geom_vline(xintercept = 5,lty=2,color="red")
 
-p3 <- ggplot() +theme_minimal()
+pMVS <- ggplot(stat_data,aes(x=d,y=d.madin)) + geom_point(alpha=0.5) + 
+  scale_x_log10() + scale_y_log10() + theme_pubclean() + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Min. Doubling Time (Vieira-Silva et al.)") + 
+  ylab("Predicted Min. Doubling Time (Trained on Madin et al.)") + 
+  geom_abline(slope = 1,intercept = 0,lty=2) + 
+  geom_vline(xintercept = 5,lty=2,color="red")
+
+pVSM <- ggplot(stat_data_madin,aes(x=d,y=d.vs)) + geom_point(alpha=0.5) + 
+  scale_x_log10() + scale_y_log10() + theme_pubclean() + 
+  geom_smooth(color="darkgrey") + xlab("Empirical Min. Doubling Time (Madin et al.)") + 
+  ylab("Predicted Min. Doubling Time (Trained on Vieira-Silva et al.)") + 
+  geom_abline(slope = 1,intercept = 0,lty=2) + 
+  geom_vline(xintercept = 5,lty=2,color="red")
 
 setwd("~/eggo/Figs")
-pdf("gRodon_performance_Madin.pdf",width=8.75,height=3.75)
-ggarrange(p3,
-          ggarrange(p1,p2,nrow=1,
-                    labels = c("(a)","(b)"),
-                    hjust=-1,
-                    vjust=-0.5),
-          nrow=2,heights = c(1,9))
+pdf("Madin_vs_VieiraSilva_fits.pdf",width=10,height=10)
+ggarrange(pVSVS,pVSM,
+          pMVS,pMM,
+          nrow=2,
+          ncol=2,
+          labels=c("(a)",
+                   "(b)",
+                   "(c)",
+                   "(d)"), 
+          hjust = -1, 
+          vjust = 1)
 dev.off()
 
+# Actual Comparison ------------------------------------------------------------
+
+d <- d_all
+dm <- dm_all
+
+rownames(d) <- d$Species
+dm$Species <- NA
+dm$Species <- d[dm$species,"Species"]
+dm$SpeciesInd <- NA
+dm$SpeciesInd[is.na(dm$Species)] <- 
+  lapply(dm$species[is.na(dm$Species)],grep,x=d$Species) %>% lapply("[",1) %>% unlist()
+dm$Species[!is.na(dm$SpeciesInd)] <- d$Species[dm$SpeciesInd[!is.na(dm$SpeciesInd)]]
+dmd <- merge.easy(dm,d,key="Species")
+
+p1 <- ggplot(dmd, aes(x = d.y, y = d.x)) +
+  geom_point() + 
+  scale_y_log10(limits=c(0.1,500)) + scale_x_log10(limits=c(0.1,500)) + 
+  geom_abline(slope=1, intercept = 0, lty = 2) + 
+  geom_smooth(color = "grey") + 
+  xlab("Empirical Min. Doubling Time (Vieira-Silva et al.)") + 
+  ylab("Empirical Min. Doubling Time (Madin et al.)") + 
+  theme_classic2()
+
+# ----------------------------------------------------------------------------
+  
+p2 <- ggplot(EGGO, aes(x = d, y = d.madin)) +
+  geom_pointdensity(adjust=1) + 
+  scale_colour_gradient(low="white",high="black",trans = "log") +
+  scale_y_log10(limits=c(0.1,500)) + scale_x_log10(limits=c(0.1,500)) + 
+  geom_abline(slope=1, intercept = 0, lty = 2) + 
+  geom_smooth(color = "grey") + 
+  theme_classic2() +
+  theme(legend.position = c(0.3,0.7)) + 
+  xlab("Predicted Min. Doubling Time (Trained on Vieira-Silva et al.)") + 
+  ylab("Predicted Min. Doubling Time (Trained on Madin et al.)")  + 
+  labs(color = "Neighbor Density")
+
+
+setwd("~/eggo/Figs")
+#pdf("Madin_vs_VieiraSilva.pdf",width=12,height=6)
+tiff(file = "Madin_vs_VieiraSilva.tiff", 
+     width = 12, 
+     height = 6, 
+     units = "in", 
+     res = 800,
+     compression="lzw")
+ggarrange(p1,p2,ncol=2,labels=c("(a)","(b)"), hjust = 0, vjust = 1)
+dev.off()
+
+cor.test(EGGO$d,EGGO$d.madin)
+cor.test(dmd$d.x,dmd$d.y)

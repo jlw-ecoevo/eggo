@@ -70,6 +70,7 @@ p1 <- ggplot() + geom_density(data=genus_df,aes(x=d),lwd=2) +
   theme(legend.position = "right") + 
   labs(fill="")
 
+
 setwd("~/eggo/Figs")
 pdf("RefSeq_vs_Parks.pdf",width=10,height=5)
 ggplot() + 
