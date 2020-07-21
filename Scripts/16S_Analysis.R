@@ -92,14 +92,14 @@ x <- read.tree("16S.cut80.tree")
 
 
 #Sample One 16S Per Organism
-tip_meta_sub <- tip_meta %>% 
-  subset(Tip %in% x$tip.label & !is.na(d)) %>% 
-  group_by(File) %>% 
+tip_meta_sub <- tip_meta %>%
+  subset(Tip %in% x$tip.label & !is.na(d)) %>%
+  group_by(File) %>%
   sample_n(1) %>%
   as.data.frame(stringsAsFactors=FALSE)
 rownames(tip_meta_sub) <- tip_meta_sub$Tip
 x_sub <- drop.tip(x, which(!(x$tip.label %in% tip_meta_sub$Tip)))
-# 
+
 # #Predict - very slow
 # neighbor_pred_list <- mclapply(1:Ntip(x_sub),
 #                                getNeighborhoodPrediction,
@@ -160,6 +160,7 @@ confusion_matrix <- table(neighbor_pred$Actual>5,neighbor_pred$Predicted>5)
 cohen.kappa(confusion_matrix)
 sum(diag(confusion_matrix))/sum(confusion_matrix)
 
+x_dist <- x_dist %>% sample_n(500000)
 
 p1 <- ggplot(neighbor_pred,aes(x=Actual,y=Predicted)) + 
   geom_pointdensity(adjust=0.1)+ 
@@ -175,49 +176,51 @@ p2 <- ggplot(x_dist,aes(x = value + 1e-8, y = dErr2)) +
   geom_pointdensity(adjust=0.1)+ 
   scale_colour_gradient(low="white",high="black",trans = "log")+
   scale_y_log10(limit=c(1e-1,1e2)) +
+  geom_smooth(color="red") + 
   scale_x_log10() + 
-  geom_smooth(color="gray") + 
   theme_classic2() + 
-  geom_hline(yintercept = 0.5, lty = 2, color = "blue") + 
-  geom_vline(xintercept = 0.2, lty = 2, color = "red") + 
+  geom_hline(yintercept = 0.5, color = "gray") + 
+  geom_vline(xintercept = 0.2, lty = 2, color = "blue") + 
   ylab(expression("Absolute Error (|" * d[1] - d[2] * "|)")) + 
   xlab("Patristic Distance")  + 
-  theme(legend.position = c(0.1,0.8)) + 
+  theme(legend.position = c(0.2,0.8)) + 
   labs(color = "Neighbor Density")
 
-
 setwd("~/eggo/Figs")
-pdf("16S_Neighbors_and_Pairs.pdf",width=14,height=5)
+#pdf("16S_Neighbors_and_Pairs.pdf",width=14,height=5)
+tiff("16S_Neighbors_and_Pairs.tiff",width=14,height=5,units="in",res=600, compression = "lzw")
 ggarrange(p1,p2,ncol=2,labels=c("(a)","(b)"),hjust = 0)
 dev.off()
-
-setwd("~/eggo/Figs")
-pdf("16S_PairDistances.pdf",width=7,height=5)
-p2
-dev.off()
-
-setwd("~/eggo/Data")
-load("nearest_neighbors.RData")
-
-xd <- x_dist %>% subset(Org1!=Org2) %>% subset(d1<100 & d2<100)
-xd$ld1 <- log10(xd$d1)
-xd$ld2 <- log10(xd$d2)
-xd$dErr <- (xd$ld1-xd$ld2)^2
-
-cor.test(xd$ld1,xd$ld2)
-
-
-p1 <- ggplot(xd,aes(x=d1,y=d2)) + 
-  geom_pointdensity(adjust=0.1)+ 
-  geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
-  scale_x_log10() + scale_y_log10() + theme_classic2() + 
-  scale_colour_gradient(low="white",high="black",trans = "log")+
-  xlab("Minimal Doubling Time (d)") + 
-  ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) + 
-  theme(legend.position = c(0.9,0.5)) + 
-  labs(color = "Neighbor Density")
-
-setwd("~/eggo/Figs")
-pdf("16S_Closest.pdf",width=7,height=5)
-p1
-dev.off()
+# 
+# setwd("~/eggo/Figs")
+# # pdf("16S_PairDistances.pdf",width=7,height=5)
+# tiff("16S_PairDistances.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+# p2
+# dev.off()
+# 
+# setwd("~/eggo/Data")
+# load("nearest_neighbors.RData")
+# 
+# xd <- x_dist %>% subset(Org1!=Org2) %>% subset(d1<100 & d2<100)
+# xd$ld1 <- log10(xd$d1)
+# xd$ld2 <- log10(xd$d2)
+# xd$dErr <- (xd$ld1-xd$ld2)^2
+# 
+# cor.test(xd$ld1,xd$ld2)
+# 
+# 
+# p1 <- ggplot(xd,aes(x=d1,y=d2)) +
+#   geom_pointdensity(adjust=0.1)+
+#   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
+#   scale_x_log10() + scale_y_log10() + theme_classic2() +
+#   scale_colour_gradient(low="white",high="black",trans = "log")+
+#   xlab("Minimal Doubling Time (d)") +
+#   ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) +
+#   theme(legend.position = c(0.9,0.5)) +
+#   labs(color = "Neighbor Density")
+# 
+# setwd("~/eggo/Figs")
+# # pdf("16S_Closest.pdf",width=7,height=5)
+# tiff("16S_Closest.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+# p1
+# dev.off()
