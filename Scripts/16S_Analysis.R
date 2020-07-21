@@ -191,36 +191,36 @@ setwd("~/eggo/Figs")
 tiff("16S_Neighbors_and_Pairs.tiff",width=14,height=5,units="in",res=600, compression = "lzw")
 ggarrange(p1,p2,ncol=2,labels=c("(a)","(b)"),hjust = 0)
 dev.off()
-# 
-# setwd("~/eggo/Figs")
-# # pdf("16S_PairDistances.pdf",width=7,height=5)
-# tiff("16S_PairDistances.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
-# p2
-# dev.off()
-# 
-# setwd("~/eggo/Data")
-# load("nearest_neighbors.RData")
-# 
-# xd <- x_dist %>% subset(Org1!=Org2) %>% subset(d1<100 & d2<100)
-# xd$ld1 <- log10(xd$d1)
-# xd$ld2 <- log10(xd$d2)
-# xd$dErr <- (xd$ld1-xd$ld2)^2
-# 
-# cor.test(xd$ld1,xd$ld2)
-# 
-# 
-# p1 <- ggplot(xd,aes(x=d1,y=d2)) +
-#   geom_pointdensity(adjust=0.1)+
-#   geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
-#   scale_x_log10() + scale_y_log10() + theme_classic2() +
-#   scale_colour_gradient(low="white",high="black",trans = "log")+
-#   xlab("Minimal Doubling Time (d)") +
-#   ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) +
-#   theme(legend.position = c(0.9,0.5)) +
-#   labs(color = "Neighbor Density")
-# 
-# setwd("~/eggo/Figs")
-# # pdf("16S_Closest.pdf",width=7,height=5)
-# tiff("16S_Closest.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
-# p1
-# dev.off()
+
+setwd("~/eggo/Figs")
+# pdf("16S_PairDistances.pdf",width=7,height=5)
+tiff("16S_PairDistances.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+p2
+dev.off()
+
+setwd("~/eggo/Data")
+load("nearest_neighbors.RData")
+
+xd <- x_dist %>% subset(Org1!=Org2) %>% subset(d1<100 & d2<100)
+xd$ld1 <- log10(xd$d1)
+xd$ld2 <- log10(xd$d2)
+xd$dErr <- (xd$ld1-xd$ld2)^2
+
+cor.test(xd$ld1,xd$ld2)
+
+
+p1 <- ggplot(xd,aes(x=d1,y=d2)) +
+  geom_pointdensity(adjust=0.1)+
+  geom_abline(slope = 1, intercept = 0, lty = 2, alpha=0.5) +
+  scale_x_log10() + scale_y_log10() + theme_classic2() +
+  scale_colour_gradient(low="white",high="black",trans = "log")+
+  xlab("Minimal Doubling Time (d)") +
+  ylab(expression("Predicted Minimal Doubling Time (" * d["Closest Relative"] * ")")) +
+  theme(legend.position = c(0.9,0.5)) +
+  labs(color = "Neighbor Density")
+
+setwd("~/eggo/Figs")
+# pdf("16S_Closest.pdf",width=7,height=5)
+tiff("16S_Closest.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+p1
+dev.off()
