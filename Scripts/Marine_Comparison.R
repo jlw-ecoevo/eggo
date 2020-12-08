@@ -199,30 +199,30 @@ isolate_mod <- phyloglm(Isolate~(d<5),
 summary(isolate_mod)
 
 
-# # Sensitivity of phylogenetic regression (slow)
-# influ_sense <- influ_phyglm(Isolate~(d<5), phy = tree.test,
-#                      data = meta, track=T)
-# samp_sense <- samp_phyglm(Isolate~(d<5), phy = tree.test,
-#             data = meta, track=T)
-# clade_sense <- clade_phyglm(Isolate~(d<5), phy = tree.test,
-#                      data = meta, clade.col = "Phylum", track=T)
-# tree_sense <- tree_phyglm(Isolate~(d<5), phy = boot.bac, 
-#                    data = meta, n.tree = 10, track=T)
-# tree_influ_sense <- tree_influ_phyglm(Isolate~(d<5), phy = boot.bac,
-#                                       data = meta, n.tree = 10, track=T)
-# tree_clade_sense <- tree_clade_phyglm(Isolate~(d<5), phy = boot.bac,
-#                                       data = meta, n.tree = 10, track=T, clade.col = "Phylum")
-# tree_samp_sense <- tree_samp_phyglm(Isolate~(d<5), phy = boot.bac,
-#                                     data = meta, n.tree = 10, track=T)
-# setwd("~/eggo/Data")
-# save(influ_sense,
-#      samp_sense,
-#      clade_sense,
-#      tree_sense,
-#      tree_influ_sense,
-#      tree_clade_sense,
-#      tree_samp_sense,
-#      file="sentivitity_phyloglm.RData")
+# Sensitivity of phylogenetic regression (slow)
+influ_sense <- influ_phyglm(Isolate~(d<5), phy = tree.test,
+                     data = meta, track=T)
+samp_sense <- samp_phyglm(Isolate~(d<5), phy = tree.test,
+            data = meta, track=T)
+clade_sense <- clade_phyglm(Isolate~(d<5), phy = tree.test,
+                     data = meta, clade.col = "Phylum", track=T)
+tree_sense <- tree_phyglm(Isolate~(d<5), phy = boot.bac,
+                   data = meta, n.tree = 10, track=T)
+tree_influ_sense <- tree_influ_phyglm(Isolate~(d<5), phy = boot.bac,
+                                      data = meta, n.tree = 10, track=T)
+tree_clade_sense <- tree_clade_phyglm(Isolate~(d<5), phy = boot.bac,
+                                      data = meta, n.tree = 10, track=T, clade.col = "Phylum")
+tree_samp_sense <- tree_samp_phyglm(Isolate~(d<5), phy = boot.bac,
+                                    data = meta, n.tree = 10, track=T)
+setwd("~/eggo/Data")
+save(influ_sense,
+     samp_sense,
+     clade_sense,
+     tree_sense,
+     tree_influ_sense,
+     tree_clade_sense,
+     tree_samp_sense,
+     file="sentivitity_phyloglm.RData")
 
 setwd("~/eggo/Data")
 load("sentivitity_phyloglm.RData")
