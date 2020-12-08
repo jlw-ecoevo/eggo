@@ -169,7 +169,9 @@ p1 <- ggplot(neighbor_pred,aes(x=Actual,y=Predicted)) +
   xlab("Minimal Doubling Time (d)") + 
   scale_colour_gradient(low="white",high="black",trans = "log")+
   ylab(expression("Predicted Minimal Doubling Time (" * d["predicted"] * ")")) + 
-  theme(legend.position = c(0.9,0.5)) + 
+  theme(legend.position = "none",
+        axis.title = element_text(size=18),
+        axis.text =  element_text(size=16)) + 
   labs(color = "Neighbor Density")
 
 p2 <- ggplot(x_dist,aes(x = value + 1e-8, y = dErr2)) + 
@@ -183,18 +185,24 @@ p2 <- ggplot(x_dist,aes(x = value + 1e-8, y = dErr2)) +
   geom_vline(xintercept = 0.2, lty = 2, color = "blue") + 
   ylab(expression("Absolute Error (|" * d[1] - d[2] * "|)")) + 
   xlab("Patristic Distance")  + 
-  theme(legend.position = c(0.2,0.8)) + 
+  theme(legend.position = c(0.2,0.8),
+        axis.title = element_text(size=18),
+        axis.text =  element_text(size=16),
+        legend.text =  element_text(size=16),
+        legend.title= element_text(size=18)) + 
   labs(color = "Neighbor Density")
 
 setwd("~/eggo/Figs")
 #pdf("16S_Neighbors_and_Pairs.pdf",width=14,height=5)
-tiff("16S_Neighbors_and_Pairs.tiff",width=14,height=5,units="in",res=600, compression = "lzw")
-ggarrange(p1,p2,ncol=2,labels=c("(a)","(b)"),hjust = 0)
+tiff("16S_Neighbors_and_Pairs.tiff",width=14,height=7,units="in",res=600, compression = "lzw")
+ggarrange(p1,p2,ncol=2,labels=c("(a)","(b)"),hjust = 0,vjust=1)
 dev.off()
+
+
 
 setwd("~/eggo/Figs")
 # pdf("16S_PairDistances.pdf",width=7,height=5)
-tiff("16S_PairDistances.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+tiff("16S_PairDistances.tiff",width=7,height=5,units="in",res=900, compression = "lzw")
 p2
 dev.off()
 
@@ -221,6 +229,6 @@ p1 <- ggplot(xd,aes(x=d1,y=d2)) +
 
 setwd("~/eggo/Figs")
 # pdf("16S_Closest.pdf",width=7,height=5)
-tiff("16S_Closest.tiff",width=7,height=5,units="in",res=600, compression = "lzw")
+tiff("16S_Closest.tiff",width=7,height=5,units="in",res=900, compression = "lzw")
 p1
 dev.off()

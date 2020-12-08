@@ -206,6 +206,18 @@ ggarrange(p3,
 dev.off()
 
 
+setwd("~/eggo/Figs")
+pdf("gRodon_performance_scatter.pdf",width=7,height=5)
+p1
+dev.off()
+pS <- p1
+
+setwd("~/eggo/Figs")
+pdf("CUB_flat.pdf",width=7,height=5)
+p2
+dev.off()
+
+
 pS1 <- ggplot(stat_data,aes(x=d,y=dGR)) + 
   geom_point(aes(y = dGR, col = "gRodon"),alpha=0.5) + 
   geom_smooth(aes(y = dGR, col = "gRodon"), se = F) +
@@ -352,6 +364,17 @@ ggarrange(p1,
                     vjust=1)
 dev.off()
 
+setwd("~/eggo/Figs")
+pdf("gRodon_vs_growthpred_cv_boxplot.pdf",width=5,height=5)
+p1
+dev.off()
+
+setwd("~/eggo/Figs")
+pdf("gRodon_vs_growthpred_slides.pdf",width=12,height=5)
+ggarrange(pS,
+          p1+theme(axis.text.x = element_text(angle=30)))
+dev.off()
+
 # Classifier -------------------------------------------------------------------
 
 p1 <- ggplot(stat_data,aes(x=dGR)) + 
@@ -384,3 +407,5 @@ pdf("Classifier.pdf",width=7,height=6)
 ggarrange(p1,p2,nrow=2,
           labels = c("(a)","(b)"))
 dev.off()
+
+

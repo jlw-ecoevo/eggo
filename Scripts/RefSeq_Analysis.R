@@ -40,6 +40,15 @@ dev.off()
 # genus_df <- assembly_df %>% group_by(Genus) %>% sample_n(1)
 genus_df <- assembly_df %>% group_by(Genus,Phylum) %>% summarise_all(mean)
 
+ggplot(genus_df,aes(x=CUBHE,y=ConsistencyHE/CUBHE)) + 
+  geom_point(aes(color=(d>5)),alpha=0.2) + 
+  geom_vline(xintercept=0.6,lty=2) + 
+  geom_smooth(color="black") +
+  theme_pubclean() +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Median Codon Usage Bias of Ribosomal Proteins") +
+  ylab("Dissimilarity of Codon Usage Bias Across Ribosomal Proteins")
+
 # Cluster growth rates ---------------------------------------------------------
 
 x <- log10(genus_df$d)
@@ -132,3 +141,20 @@ ggarrange(p1,
           vjust=1)
 dev.off()
 
+
+setwd("~/eggo/Figs")
+pdf("RefSeq_Growth_poster.pdf",width=5,height=4)
+p1 + theme(legend.position="bottom") + 
+  scale_fill_discrete(labels=c("Copiotrophs","Oligotrophs"))
+
+dev.off()
+
+
+
+
+setwd("~/eggo/Figs")
+pdf("RefSeq_Growth_poster.pdf",width=5,height=4)
+p1 + theme(legend.position="bottom") + 
+  scale_fill_discrete(labels=c("Copiotrophs","Oligotrophs"))
+
+dev.off()

@@ -51,3 +51,10 @@ ggarrange(p1,
           hjust=0)
 dev.off()
 
+
+
+ggplot(stat_data[!is.na(stat_data$Ne),],aes(x=d/Ne,y=Residual)) + geom_point() + 
+  geom_smooth(method="lm",color="darkgray") + 
+  scale_x_log10() + 
+  geom_hline(yintercept = 0, lty =2) + 
+  theme_bw()
